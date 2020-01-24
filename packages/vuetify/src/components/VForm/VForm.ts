@@ -30,6 +30,7 @@ export default mixins(
   props: {
     lazyValidation: Boolean,
     value: Boolean,
+    disabled: Boolean,
   },
 
   data: () => ({
@@ -46,6 +47,14 @@ export default mixins(
         this.$emit('input', !errors)
       },
       deep: true,
+      immediate: true,
+    },
+    disabled: {
+      handler (val) {
+        this.$nextTick(() => {
+          this.propagateDisabledToInputs(val)
+        })
+      },
       immediate: true,
     },
   },
@@ -88,6 +97,11 @@ export default mixins(
     reset (): void {
       this.inputs.forEach(input => input.reset())
       this.resetErrorBag()
+    },
+    propagateDisabledToInputs (disabled: boolean): void {
+      this.inputs.forEach(input => {
+        input.formDisabled(disabled)
+      })
     },
     resetErrorBag () {
       if (this.lazyValidation) {

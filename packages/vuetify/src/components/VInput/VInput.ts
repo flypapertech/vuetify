@@ -61,6 +61,7 @@ export default baseMixins.extend<options>().extend({
     return {
       lazyValue: this.value,
       hasMouseDown: false,
+      isFormDisabled: false,
     }
   },
 
@@ -71,7 +72,7 @@ export default baseMixins.extend<options>().extend({
         'v-input--hide-details': !this.showDetails,
         'v-input--is-label-active': this.isLabelActive,
         'v-input--is-dirty': this.isDirty,
-        'v-input--is-disabled': this.disabled,
+        'v-input--is-disabled': this.isDisabled,
         'v-input--is-focused': this.isFocused,
         'v-input--is-loading': this.loading !== false && this.loading !== undefined,
         'v-input--is-readonly': this.readonly,
@@ -107,6 +108,7 @@ export default baseMixins.extend<options>().extend({
       return !!this.lazyValue
     },
     isDisabled (): boolean {
+      if (this.isFormDisabled) return true
       return this.disabled || this.readonly
     },
     isLabelActive (): boolean {
@@ -150,6 +152,9 @@ export default baseMixins.extend<options>().extend({
         this.genAppendSlot(),
       ]
     },
+    formDisabled (disabled: boolean) {
+      this.isFormDisabled = disabled
+    },
     genControl () {
       return this.$createElement('div', {
         staticClass: 'v-input__control',
@@ -178,7 +183,7 @@ export default baseMixins.extend<options>().extend({
           'aria-label': hasListener ? kebabCase(type).split('-')[0] + ' icon' : undefined,
           color: this.validationState,
           dark: this.dark,
-          disabled: this.disabled,
+          disabled: this.isDisabled,
           light: this.light,
         },
         on: !hasListener
@@ -230,7 +235,7 @@ export default baseMixins.extend<options>().extend({
         props: {
           color: this.validationState,
           dark: this.dark,
-          disabled: this.disabled,
+          disabled: this.isDisabled,
           focused: this.hasState,
           for: this.computedId,
           light: this.light,
