@@ -5,7 +5,6 @@ import {
   Wrapper,
 } from '@vue/test-utils'
 import VTextField from '../../VTextField'
-import VBtn from '../../VBtn'
 import VForm from '../VForm'
 
 const inputOne = Vue.component('input-one', {
@@ -243,5 +242,25 @@ describe('VForm.ts', () => {
     await wrapper.vm.$nextTick()
 
     expect(validate).toHaveBeenCalledTimes(2)
+  })
+
+  it('should disable all inputs', async () => {
+    const wrapper = mountFunction({
+      propsData: {
+        disabled: true,
+      },
+      slots: {
+        default: [VTextField],
+      },
+    })
+
+    await wrapper.vm.$nextTick()
+
+    let disabledInputs = 0
+    wrapper.vm.inputs.forEach(input => {
+      if (input.isDisabled) disabledInputs++
+    })
+
+    expect(disabledInputs).toBe(wrapper.vm.inputs.length)
   })
 })
