@@ -2,7 +2,8 @@ import Vue from 'vue'
 import { VueConstructor } from 'vue/types/vue'
 import { consoleWarn } from '../../util/console'
 
-function generateWarning (child: string, parent: string) {
+function generateWarning (child: string, parent: string, nestingOptional?: boolean) {
+  if (nestingOptional) return () => {}
   return () => consoleWarn(`The ${child} component must be used inside a ${parent}`)
 }
 
@@ -15,10 +16,10 @@ export type Registrable<T extends string, C extends VueConstructor | null = null
 
 export function inject<
   T extends string, C extends VueConstructor | null = null
-> (namespace: T, child?: string, parent?: string): Registrable<T, C> {
+> (namespace: T, child?: string, parent?: string, nestingOptional?: boolean): Registrable<T, C> {
   const defaultImpl = child && parent ? {
-    register: generateWarning(child, parent),
-    unregister: generateWarning(child, parent),
+    register: generateWarning(child, parent, nestingOptional),
+    unregister: generateWarning(child, parent, nestingOptional),
   } : null
 
   return Vue.extend({

@@ -9,6 +9,7 @@ import VMessages from '../VMessages'
 // Mixins
 import BindsAttrs from '../../mixins/binds-attrs'
 import Validatable from '../../mixins/validatable'
+import { inject as RegistrableInject } from '../../mixins/registrable'
 
 // Utilities
 import {
@@ -25,7 +26,9 @@ import { InputValidationRule } from 'types'
 
 const baseMixins = mixins(
   BindsAttrs,
-  Validatable
+  Validatable,
+  // couldn't use typeof VForm here because it creates a circular import
+  RegistrableInject<'form', any>('form', 'v-input', 'v-form', true),
 )
 
 interface options extends InstanceType<typeof baseMixins> {
@@ -61,7 +64,6 @@ export default baseMixins.extend<options>().extend({
     return {
       lazyValue: this.value,
       hasMouseDown: false,
-      isFormDisabled: false,
     }
   },
 
@@ -108,7 +110,7 @@ export default baseMixins.extend<options>().extend({
       return !!this.lazyValue
     },
     isDisabled (): boolean {
-      if (this.isFormDisabled) return true
+      if (this.form && this.form.disabled) return true
       return this.disabled || this.readonly
     },
     isLabelActive (): boolean {
@@ -151,9 +153,6 @@ export default baseMixins.extend<options>().extend({
         this.genControl(),
         this.genAppendSlot(),
       ]
-    },
-    formDisabled (disabled: boolean) {
-      this.isFormDisabled = disabled
     },
     genControl () {
       return this.$createElement('div', {
